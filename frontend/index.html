@@ -1,0 +1,1286 @@
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Bias Lab - Media Intelligence Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066FF;
+            --left-bias: #3B82F6;
+            --center-bias: #8B5CF6;
+            --right-bias: #EF4444;
+            --factual: #10B981;
+            --emotional: #F59E0B;
+            --bg-dark: #0A0E27;
+            --bg-card: #141827;
+            --text-primary: #F3F4F6;
+            --text-secondary: #9CA3AF;
+            --border: #1F2937;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0A0E27 0%, #0F172A 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 14, 39, 0.8);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--center-bias) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-tab {
+            padding: 1rem 2rem;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        .nav-tab.active {
+            color: var(--primary);
+        }
+
+        .nav-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary);
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        /* Narrative Clusters */
+        .narrative-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .narrative-card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .narrative-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--left-bias) 0%, var(--center-bias) 50%, var(--right-bias) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .narrative-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        .narrative-card:hover::before {
+            opacity: 1;
+        }
+
+        .narrative-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .trending-badge {
+            background: linear-gradient(135deg, #F59E0B, #EF4444);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .divergence-meter {
+            margin: 1.5rem 0;
+        }
+
+        .divergence-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .divergence-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .divergence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--emotional) 100%);
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .source-bubbles {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .source-bubble {
+            padding: 0.5rem 1rem;
+            background: rgba(0, 102, 255, 0.1);
+            border: 1px solid rgba(0, 102, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+        }
+
+        .source-bubble:hover {
+            background: rgba(0, 102, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Article List */
+        .article-list {
+            margin: 3rem 0;
+        }
+
+        .article-card {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .article-card:hover {
+            border-color: var(--primary);
+            transform: translateX(4px);
+        }
+
+        .source-indicator {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .source-left { background: linear-gradient(135deg, var(--left-bias), rgba(59, 130, 246, 0.3)); }
+        .source-center { background: linear-gradient(135deg, var(--center-bias), rgba(139, 92, 246, 0.3)); }
+        .source-right { background: linear-gradient(135deg, var(--right-bias), rgba(239, 68, 68, 0.3)); }
+
+        .article-content {
+            flex: 1;
+        }
+
+        .article-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .article-excerpt {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin-bottom: 0.75rem;
+        }
+
+        .bias-mini-scores {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .mini-score {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .mini-score-bar {
+            width: 40px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .mini-score-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        /* Radar Chart */
+        .radar-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+        }
+
+        .radar-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Article Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 2rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .bias-breakdown {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .radar-chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .dimension-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .dimension-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .dimension-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .dimension-value {
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .dimension-bar {
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .dimension-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        .article-text-analysis {
+            margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .article-full-text {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .biased-phrase {
+            position: relative;
+            cursor: help;
+            transition: all 0.3s ease;
+            border-bottom: 2px dotted transparent;
+            display: inline;
+        }
+
+        .biased-phrase.framing_choices {
+            background: rgba(139, 92, 246, 0.2);
+            border-bottom-color: var(--center-bias);
+        }
+
+        .biased-phrase.ideological_stance {
+            background: rgba(59, 130, 246, 0.2);
+            border-bottom-color: var(--left-bias);
+        }
+
+        .biased-phrase.emotional_tone {
+            background: rgba(245, 158, 11, 0.2);
+            border-bottom-color: var(--emotional);
+        }
+
+        .biased-phrase.factual_grounding {
+            background: rgba(16, 185, 129, 0.2);
+            border-bottom-color: var(--factual);
+        }
+
+        .biased-phrase.source_transparency {
+            background: rgba(6, 182, 212, 0.2);
+            border-bottom-color: #06B6D4;
+        }
+
+        .biased-phrase:hover {
+            background: rgba(0, 102, 255, 0.3);
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-dark);
+            border: 1px solid var(--primary);
+            padding: 0.75rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            margin-bottom: 0.5rem;
+            max-width: 300px;
+            white-space: normal;
+        }
+
+        .biased-phrase:hover .tooltip {
+            opacity: 1;
+        }
+
+        /* Loading State */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Comparison View */
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .comparison-article {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .comparison-highlight {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 3px solid var(--primary);
+        }
+
+        .comparison-facts {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+        }
+
+        .fact-comparison {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .fact-comparison:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .fact-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .fact-framing {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .framing-item {
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 0.875rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .narrative-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .bias-breakdown {
+                grid-template-columns: 1fr;
+            }
+
+            .comparison-container {
+                grid-template-columns: 1fr;
+            }
+
+            .article-card {
+                grid-template-columns: 1fr;
+            }
+
+            .fact-framing {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* View state helper */
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="logo">The Bias Lab</div>
+            <div class="tagline">Real-time media bias intelligence</div>
+        </div>
+    </header>
+
+    <main class="container">
+        <nav class="nav-tabs">
+            <button class="nav-tab active" data-view="narratives">Trending Narratives</button>
+            <button class="nav-tab" data-view="articles">All Articles</button>
+            <button class="nav-tab" data-view="comparison">Compare Coverage</button>
+        </nav>
+
+        <!-- Narratives View -->
+        <div id="narratives-view" class="view active">
+            <div class="narrative-grid" id="narrative-grid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Articles View -->
+        <div id="articles-view" class="view">
+            <div class="article-list" id="article-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison View -->
+        <div id="comparison-view" class="view">
+            <div class="comparison-container" id="comparison-container">
+                <div class="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Article Detail Modal -->
+    <div id="article-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modal-title"></h2>
+                    <div id="modal-source" style="margin-top: 0.5rem; color: var(--text-secondary);"></div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Content will be injected here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = 'http://localhost:8000/api';
+        
+        // State
+        let currentView = 'narratives';
+        let narratives = [];
+        let articles = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupNavigation();
+            loadNarratives();
+            loadArticles();
+        });
+
+        // Navigation
+        function setupNavigation() {
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    const view = e.target.dataset.view;
+                    switchView(view);
+                });
+            });
+
+            // Close modal on escape
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                }
+            });
+
+            // Close modal on background click
+            document.getElementById('article-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'article-modal') {
+                    closeModal();
+                }
+            });
+        }
+
+        function switchView(view) {
+            // Update tabs
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.view === view);
+            });
+
+            // Update views
+            document.querySelectorAll('.view').forEach(v => {
+                v.classList.remove('active');
+            });
+            document.getElementById(`${view}-view`).classList.add('active');
+
+            currentView = view;
+
+            // Load comparison if needed
+            if (view === 'comparison') {
+                loadComparison();
+            }
+        }
+
+        // Load Narratives
+        async function loadNarratives() {
+            try {
+                const response = await fetch(`${API_BASE}/narratives`);
+                if (!response.ok) throw new Error('Failed to fetch narratives');
+                narratives = await response.json();
+                renderNarratives();
+            } catch (error) {
+                console.error('Failed to load narratives:', error);
+                document.getElementById('narrative-grid').innerHTML = `
+                    <div style="text-align: center; color: var(--text-secondary);">
+                        Failed to load narratives. Make sure the backend is running on port 8000.
+                    </div>
+                `;
+            }
+        }
+
+        function renderNarratives() {
+            const grid = document.getElementById('narrative-grid');
+            grid.innerHTML = narratives.map(narrative => `
+                <div class="narrative-card" onclick="loadNarrativeArticles('${narrative.id}')">
+                    <div class="narrative-title">
+                        ${narrative.title}
+                        ${narrative.trending ? '<span class="trending-badge">TRENDING</span>' : ''}
+                    </div>
+                    
+                    <div class="divergence-meter">
+                        <div class="divergence-label">Coverage Divergence: ${Math.round(narrative.divergence_score * 100)}%</div>
+                        <div class="divergence-bar">
+                            <div class="divergence-fill" style="width: ${narrative.divergence_score * 100}%"></div>
+                        </div>
+                    </div>
+
+                    <div class="source-bubbles">
+                        ${narrative.sources.map(source => 
+                            `<span class="source-bubble">${source}</span>`
+                        ).join('')}
+                    </div>
+
+                    <div style="margin-top: 1rem; color: var(--text-secondary); font-size: 0.875rem;">
+                        ${narrative.article_count} articles analyzed
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Load Articles
+        async function loadArticles(narrativeId = null) {
+            try {
+                const url = narrativeId 
+                    ? `${API_BASE}/articles?narrative=${narrativeId}`
+                    : `${API_BASE}/articles`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Failed to fetch articles');
+                articles = await response.json();
+                renderArticles();
+            } catch (error) {
+                console.error('Failed to load articles:', error);
+                document.getElementById('article-list').innerHTML = `
+                    <div style="text-align: center; color: var(--text-secondary);">
+                        Failed to load articles. Make sure the backend is running on port 8000.
+                    </div>
+                `;
+            }
+        }
+
+        function renderArticles() {
+            const list = document.getElementById('article-list');
+            list.innerHTML = articles.map(article => {
+                const leanClass = `source-${article.source_lean}`;
+                return `
+                    <div class="article-card" onclick="showArticleDetail('${article.id}')">
+                        <div class="source-indicator ${leanClass}">
+                            ${article.source.substring(0, 3).toUpperCase()}
+                        </div>
+                        
+                        <div class="article-content">
+                            <div class="article-title">${article.title}</div>
+                            <div class="article-excerpt">${article.excerpt}</div>
+                            
+                            <div class="bias-mini-scores">
+                                ${renderMiniScore('Factual', article.bias_scores.factual_grounding, '#10B981')}
+                                ${renderMiniScore('Emotional', article.bias_scores.emotional_tone, '#F59E0B')}
+                                ${renderMiniScore('Transparent', article.bias_scores.source_transparency, '#3B82F6')}
+                            </div>
+                        </div>
+
+                        <div class="radar-container">
+                            ${createMiniRadar(article.bias_scores)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderMiniScore(label, value, color) {
+            return `
+                <div class="mini-score">
+                    <span>${label}</span>
+                    <div class="mini-score-bar">
+                        <div class="mini-score-fill" style="width: ${value}%; background: ${color};"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load Narrative Articles
+        async function loadNarrativeArticles(narrativeId) {
+            await loadArticles(narrativeId);
+            switchView('articles');
+        }
+
+        // Article Detail Modal
+        function showArticleDetail(articleId) {
+            const article = articles.find(a => a.id === articleId);
+            if (!article) return;
+
+            const modal = document.getElementById('article-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const modalSource = document.getElementById('modal-source');
+            const modalBody = document.getElementById('modal-body');
+
+            modalTitle.textContent = article.title;
+            modalSource.textContent = `${article.source} • ${getSourceLeanLabel(article.source_lean)}`;
+
+            modalBody.innerHTML = `
+                <div class="bias-breakdown">
+                    <div class="radar-chart-container">
+                        <h3 style="margin-bottom: 1rem;">Bias Analysis</h3>
+                        ${createDetailedRadar(article.bias_scores)}
+                        <div style="margin-top: 1rem; text-align: center; color: var(--text-secondary); font-size: 0.875rem;">
+                            Confidence: ${Math.round(article.bias_scores.confidence * 100)}%
+                        </div>
+                    </div>
+                    
+                    <div class="dimension-scores">
+                        ${renderDimensionScore('Ideological Stance', article.bias_scores.ideological_stance, getIdeologyLabel(article.bias_scores.ideological_stance))}
+                        ${renderDimensionScore('Factual Grounding', article.bias_scores.factual_grounding, getFactualLabel(article.bias_scores.factual_grounding))}
+                        ${renderDimensionScore('Framing Choices', article.bias_scores.framing_choices, getFramingLabel(article.bias_scores.framing_choices))}
+                        ${renderDimensionScore('Emotional Tone', article.bias_scores.emotional_tone, getEmotionalLabel(article.bias_scores.emotional_tone))}
+                        ${renderDimensionScore('Source Transparency', article.bias_scores.source_transparency, getTransparencyLabel(article.bias_scores.source_transparency))}
+                    </div>
+                </div>
+
+                <div class="article-text-analysis">
+                    <h3 class="section-title">
+                        <span>📝</span>
+                        Article Text with Bias Indicators
+                    </h3>
+                    <div class="article-full-text">
+                        ${highlightBiasedPhrases(article.full_text, article.biased_phrases)}
+                    </div>
+                </div>
+
+                ${article.biased_phrases.length > 0 ? `
+                    <div style="margin-top: 2rem;">
+                        <h3 class="section-title">
+                            <span>🎯</span>
+                            Identified Bias Indicators
+                        </h3>
+                        ${article.biased_phrases.map(phrase => `
+                            <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                                <div style="font-weight: 600; margin-bottom: 0.5rem;">"${phrase.text}"</div>
+                                <div style="color: var(--text-secondary); font-size: 0.875rem;">
+                                    <strong>Type:</strong> ${formatDimensionName(phrase.dimension)} • ${phrase.explanation}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                ` : ''}
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('article-modal').classList.remove('active');
+        }
+
+        // Comparison View
+        async function loadComparison() {
+            const container = document.getElementById('comparison-container');
+            
+            // For demo, compare CNN vs Fox articles
+            const cnnArticle = articles.find(a => a.source === 'CNN');
+            const foxArticle = articles.find(a => a.source === 'Fox News');
+            
+            if (!cnnArticle || !foxArticle) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Load articles first to see comparison</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/comparison/${cnnArticle.id}/${foxArticle.id}`);
+                if (!response.ok) throw new Error('Failed to fetch comparison');
+                const data = await response.json();
+                
+                container.innerHTML = `
+                    <div class="comparison-article">
+                        <h3 style="color: var(--left-bias);">${data.article1.source}</h3>
+                        <h4 style="margin: 1rem 0; font-size: 1rem;">${data.article1.title}</h4>
+                        <div class="comparison-highlight">
+                            ${data.article1.excerpt}
+                        </div>
+                        ${createDetailedRadar(data.article1.bias_scores)}
+                    </div>
+                    
+                    <div class="comparison-article">
+                        <h3 style="color: var(--right-bias);">${data.article2.source}</h3>
+                        <h4 style="margin: 1rem 0; font-size: 1rem;">${data.article2.title}</h4>
+                        <div class="comparison-highlight">
+                            ${data.article2.excerpt}
+                        </div>
+                        ${createDetailedRadar(data.article2.bias_scores)}
+                    </div>
+                    
+                    <div style="grid-column: 1 / -1;">
+                        <div class="comparison-facts">
+                            <h3 style="margin-bottom: 1.5rem;">Same Facts, Different Spin</h3>
+                            ${data.same_facts_different_spin.map(fact => `
+                                <div class="fact-comparison">
+                                    <div class="fact-label">Fact: "${fact.fact}"</div>
+                                    <div class="fact-framing">
+                                        <div class="framing-item" style="border-left: 3px solid var(--left-bias);">
+                                            <strong>${data.article1.source}:</strong> ${fact.article1_framing}
+                                        </div>
+                                        <div class="framing-item" style="border-left: 3px solid var(--right-bias);">
+                                            <strong>${data.article2.source}:</strong> ${fact.article2_framing}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('Failed to load comparison:', error);
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Failed to load comparison</p>';
+            }
+        }
+
+        // Helper Functions
+        function renderDimensionScore(name, value, label) {
+            const color = getDimensionColor(name);
+            return `
+                <div class="dimension-item">
+                    <div class="dimension-header">
+                        <span class="dimension-name">${name}</span>
+                        <span class="dimension-value">${value}/100</span>
+                    </div>
+                    <div class="dimension-bar">
+                        <div class="dimension-fill" style="width: ${value}%; background: ${color};"></div>
+                    </div>
+                    <div style="margin-top: 0.5rem; font-size: 0.75rem; color: var(--text-secondary);">
+                        ${label}
+                    </div>
+                </div>
+            `;
+        }
+
+        function getDimensionColor(dimension) {
+            const colors = {
+                'Ideological Stance': '#3B82F6',
+                'Factual Grounding': '#10B981',
+                'Framing Choices': '#8B5CF6',
+                'Emotional Tone': '#F59E0B',
+                'Source Transparency': '#06B6D4'
+            };
+            return colors[dimension] || '#6B7280';
+        }
+
+        function getIdeologyLabel(value) {
+            if (value < 20) return 'Far Left';
+            if (value < 35) return 'Left-Leaning';
+            if (value < 45) return 'Center-Left';
+            if (value < 55) return 'Center';
+            if (value < 65) return 'Center-Right';
+            if (value < 80) return 'Right-Leaning';
+            return 'Far Right';
+        }
+
+        function getFactualLabel(value) {
+            if (value < 30) return 'Low Factual Basis';
+            if (value < 60) return 'Mixed Factual Basis';
+            if (value < 80) return 'Mostly Factual';
+            return 'Highly Factual';
+        }
+
+        function getFramingLabel(value) {
+            if (value < 30) return 'Neutral Framing';
+            if (value < 60) return 'Some Framing Bias';
+            return 'Heavy Framing Bias';
+        }
+
+        function getEmotionalLabel(value) {
+            if (value < 30) return 'Neutral Tone';
+            if (value < 60) return 'Somewhat Emotional';
+            return 'Highly Emotional';
+        }
+
+        function getTransparencyLabel(value) {
+            if (value < 30) return 'Poor Attribution';
+            if (value < 60) return 'Some Attribution';
+            if (value < 80) return 'Good Attribution';
+            return 'Excellent Attribution';
+        }
+
+        function getSourceLeanLabel(lean) {
+            const labels = {
+                'left': 'Left-Leaning',
+                'center': 'Center',
+                'right': 'Right-Leaning'
+            };
+            return labels[lean] || lean;
+        }
+
+        function formatDimensionName(dimension) {
+            return dimension.split('_').map(word => 
+                word.charAt(0).toUpperCase() + word.slice(1)
+            ).join(' ');
+        }
+
+        function highlightBiasedPhrases(text, phrases) {
+            if (!phrases || phrases.length === 0) return text;
+            
+            // Create a copy and sort phrases by position to avoid overlap issues
+            const sortedPhrases = [...phrases].sort((a, b) => b.start - a.start);
+            
+            let highlightedText = text;
+            
+            sortedPhrases.forEach(phrase => {
+                const className = phrase.dimension;
+                const before = highlightedText.substring(0, phrase.start);
+                const highlighted = `<span class="biased-phrase ${className}">
+                    ${phrase.text}
+                    <span class="tooltip">${phrase.explanation}</span>
+                </span>`;
+                const after = highlightedText.substring(phrase.end);
+                highlightedText = before + highlighted + after;
+            });
+            
+            return highlightedText;
+        }
+
+        function createMiniRadar(scores) {
+            const size = 200;
+            const center = size / 2;
+            const radius = 80;
+            
+            const dimensions = [
+                { key: 'ideological_stance', label: 'Ideology', color: '#3B82F6' },
+                { key: 'factual_grounding', label: 'Factual', color: '#10B981' },
+                { key: 'framing_choices', label: 'Framing', color: '#8B5CF6' },
+                { key: 'emotional_tone', label: 'Emotional', color: '#F59E0B' },
+                { key: 'source_transparency', label: 'Transparency', color: '#06B6D4' }
+            ];
+            
+            const angleStep = (Math.PI * 2) / dimensions.length;
+            
+            // Calculate points
+            const points = dimensions.map((dim, i) => {
+                const angle = angleStep * i - Math.PI / 2;
+                const value = scores[dim.key] / 100;
+                const x = center + Math.cos(angle) * radius * value;
+                const y = center + Math.sin(angle) * radius * value;
+                return `${x},${y}`;
+            }).join(' ');
+            
+            // Create grid lines
+            const gridLines = dimensions.map((dim, i) => {
+                const angle = angleStep * i - Math.PI / 2;
+                const x = center + Math.cos(angle) * radius;
+                const y = center + Math.sin(angle) * radius;
+                const labelX = center + Math.cos(angle) * (radius + 20);
+                const labelY = center + Math.sin(angle) * (radius + 20);
+                
+                return `
+                    <line x1="${center}" y1="${center}" x2="${x}" y2="${y}" 
+                          stroke="var(--border)" stroke-width="1" opacity="0.3"/>
+                    <text x="${labelX}" y="${labelY}" 
+                          fill="var(--text-secondary)" font-size="10" 
+                          text-anchor="middle" dominant-baseline="middle">
+                        ${dim.label}
+                    </text>
+                `;
+            }).join('');
+            
+            return `
+                <svg class="radar-svg" viewBox="0 0 ${size} ${size}">
+                    <!-- Grid circles -->
+                    ${[0.25, 0.5, 0.75, 1].map(scale => 
+                        `<circle cx="${center}" cy="${center}" r="${radius * scale}" 
+                                fill="none" stroke="var(--border)" stroke-width="1" opacity="0.3"/>`
+                    ).join('')}
+                    
+                    <!-- Axes and labels -->
+                    ${gridLines}
+                    
+                    <!-- Data polygon -->
+                    <polygon points="${points}" 
+                            fill="var(--primary)" 
+                            fill-opacity="0.3" 
+                            stroke="var(--primary)" 
+                            stroke-width="2"/>
+                    
+                    <!-- Data points -->
+                    ${dimensions.map((dim, i) => {
+                        const angle = angleStep * i - Math.PI / 2;
+                        const value = scores[dim.key] / 100;
+                        const x = center + Math.cos(angle) * radius * value;
+                        const y = center + Math.sin(angle) * radius * value;
+                        return `<circle cx="${x}" cy="${y}" r="4" fill="var(--primary)"/>`;
+                    }).join('')}
+                </svg>
+            `;
+        }
+
+        function createDetailedRadar(scores) {
+            const size = 280;
+            const center = size / 2;
+            const radius = 100;
+            
+            const dimensions = [
+                { key: 'ideological_stance', label: 'Ideology', color: '#3B82F6' },
+                { key: 'factual_grounding', label: 'Factual', color: '#10B981' },
+                { key: 'framing_choices', label: 'Framing', color: '#8B5CF6' },
+                { key: 'emotional_tone', label: 'Emotional', color: '#F59E0B' },
+                { key: 'source_transparency', label: 'Transparency', color: '#06B6D4' }
+            ];
+            
+            const angleStep = (Math.PI * 2) / dimensions.length;
+            
+            // Calculate points
+            const points = dimensions.map((dim, i) => {
+                const angle = angleStep * i - Math.PI / 2;
+                const value = scores[dim.key] / 100;
+                const x = center + Math.cos(angle) * radius * value;
+                const y = center + Math.sin(angle) * radius * value;
+                return `${x},${y}`;
+            }).join(' ');
+            
+            // Create grid lines with labels
+            const gridLines = dimensions.map((dim, i) => {
+                const angle = angleStep * i - Math.PI / 2;
+                const x = center + Math.cos(angle) * radius;
+                const y = center + Math.sin(angle) * radius;
+                const labelX = center + Math.cos(angle) * (radius + 25);
+                const labelY = center + Math.sin(angle) * (radius + 25);
+                
+                return `
+                    <line x1="${center}" y1="${center}" x2="${x}" y2="${y}" 
+                          stroke="var(--border)" stroke-width="1" opacity="0.3"/>
+                    <text x="${labelX}" y="${labelY}" 
+                          fill="var(--text-secondary)" font-size="12" 
+                          text-anchor="middle" dominant-baseline="middle">
+                        ${dim.label}
+                    </text>
+                `;
+            }).join('');
+            
+            return `
+                <svg class="radar-svg" viewBox="0 0 ${size} ${size}" style="width: 100%; height: auto;">
+                    <!-- Background gradient -->
+                    <defs>
+                        <radialGradient id="radarGradient">
+                            <stop offset="0%" stop-color="var(--primary)" stop-opacity="0.1"/>
+                            <stop offset="100%" stop-color="var(--primary)" stop-opacity="0"/>
+                        </radialGradient>
+                    </defs>
+                    
+                    <!-- Grid circles -->
+                    ${[0.25, 0.5, 0.75, 1].map(scale => 
+                        `<circle cx="${center}" cy="${center}" r="${radius * scale}" 
+                                fill="none" stroke="var(--border)" stroke-width="1" opacity="0.3"/>`
+                    ).join('')}
+                    
+                    <!-- Grid values -->
+                    ${[25, 50, 75, 100].map((value, i) => 
+                        `<text x="${center + 5}" y="${center - radius * (i + 1) * 0.25}" 
+                               fill="var(--text-secondary)" font-size="10" opacity="0.5">
+                            ${value}
+                        </text>`
+                    ).join('')}
+                    
+                    <!-- Axes and labels -->
+                    ${gridLines}
+                    
+                    <!-- Data polygon -->
+                    <polygon points="${points}" 
+                            fill="url(#radarGradient)" 
+                            stroke="var(--primary)" 
+                            stroke-width="2"/>
+                    
+                    <!-- Data points with values -->
+                    ${dimensions.map((dim, i) => {
+                        const angle = angleStep * i - Math.PI / 2;
+                        const value = scores[dim.key] / 100;
+                        const x = center + Math.cos(angle) * radius * value;
+                        const y = center + Math.sin(angle) * radius * value;
+                        return `
+                            <circle cx="${x}" cy="${y}" r="5" fill="${dim.color}"/>
+                            <text x="${x}" y="${y - 10}" 
+                                  fill="${dim.color}" font-size="10" font-weight="bold"
+                                  text-anchor="middle">
+                                ${scores[dim.key]}
+                            </text>
+                        `;
+                    }).join('')}
+                </svg>
+            `;
+        }
+
+        // Auto-refresh simulation (optional)
+        setInterval(() => {
+            // In production, this would check for new articles
+            console.log('Checking for updates...');
+        }, 30000);
+
+        // Error handling for modal close
+        window.closeModal = closeModal;
+    </script>
+</body>
+</html>
