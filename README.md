@@ -2,7 +2,7 @@
 
 ## 🔗 Live Demo
 **Frontend:** https://your-netlify-url.netlify.app  
-**Backend API:** https://bias-lab-api.onrender.com  
+**Backend API:** [https://bias-lab-api.onrender.com  ](https://bias-lab-api.onrender.com)
 **Demo Video:** [60-second Loom walkthrough]
 
 ## ⚡ Performance Metrics
