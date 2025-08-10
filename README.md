@@ -1,8 +1,8 @@
 # The Bias Lab - Full-Stack Engineer Submission
 
 ## 🔗 Live Demo
-**Frontend:** https://beautiful-dieffenbachia-131503.netlify.app/
-**Backend API:** https://bias-lab-api.onrender.com/api
+**Frontend:** [https://beautiful-dieffenbachia-131503.netlify.app/](https://beautiful-dieffenbachia-131503.netlify.app)
+**Backend API:** https://bias-lab-api.onrender.com
 **Demo Video:** [60-second Loom walkthrough]
 
 ## ⚡ Performance Metrics
