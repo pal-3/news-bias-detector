@@ -3,7 +3,7 @@
 ## 🔗 Live Demo
 **Frontend:** [https://beautiful-dieffenbachia-131503.netlify.app/](https://beautiful-dieffenbachia-131503.netlify.app)
 **Backend API:** https://bias-lab-api.onrender.com
-**Demo Video:** [60-second Loom walkthrough]
+**Demo Video:** [https://www.loom.com/share/778562a5860745baaf1bbb0b76498975]
 
 ## ⚡ Performance Metrics
 - **First Load:** 1.2 seconds
